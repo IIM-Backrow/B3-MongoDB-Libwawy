@@ -1,13 +1,23 @@
 import mongoose from 'mongoose';
 
-const BooksScheme = new mongoose.schema({
+const BooksScheme = new mongoose.Schema({
+    _id: {
+        type: String,
+        required: true,
+        validate: {
+            validator: function(v) {
+                return /^(ISBN|ISSN|UNKN)\:[0-9]+$/.test(v);
+            },
+            message: props => `${props.value} is not a valid ID format! Must be 'ISBN', 'ISSN', or 'UNKN' followed by numbers`
+        }
+    },
     title: {
         type: String,
         required: true,
     },
     illustration: {
         type: Buffer,
-        required: false,
+        required: true,
     },
     authors: {
         type: [String],
@@ -57,7 +67,7 @@ const BooksScheme = new mongoose.schema({
             required: false,
         }
     }]
-},)
+})
 
 BooksScheme.index({ _id:1})
 BooksScheme.index({title:1})
