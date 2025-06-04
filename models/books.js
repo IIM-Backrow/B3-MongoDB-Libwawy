@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const BooksScheme = new mongoose.Schema({
-    _id: {
+    id: {
         type: String,
         required: true,
         validate: {
@@ -69,7 +69,7 @@ const BooksScheme = new mongoose.Schema({
     }]
 })
 
-BooksScheme.index({ _id:1})
+BooksScheme.index({ id:1})
 BooksScheme.index({title:1})
 BooksScheme.index({authors:1})
 BooksScheme.index({themes:1})
