@@ -116,7 +116,20 @@ export const createBook = async (req, res) => {
 
         if (!id || !title || !illustration || !authors || !themes || !page_count ||
             !release_date || !publisher) {
-            return res.status(400).json({ message: "Champs obligatoires manquants" });
+            const missingFields = [];
+            if (!id) missingFields.push('id');
+            if (!title) missingFields.push('title');
+            if (!illustration) missingFields.push('illustration');
+            if (!authors) missingFields.push('authors');
+            if (!themes) missingFields.push('themes');
+            if (!page_count) missingFields.push('page_count');
+            if (!release_date) missingFields.push('release_date');
+            if (!publisher) missingFields.push('publisher');
+            
+            return res.status(400).json({ 
+                message: "Champs obligatoires manquants", 
+                missingFields 
+            });
         }
 
         const idPattern = /^(ISBN|ISSN|UNKN)\:[0-9]+$/;
