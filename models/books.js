@@ -16,7 +16,7 @@ const BooksScheme = new mongoose.Schema({
         required: true,
     },
     illustration: {
-        type: Buffer,
+        type: String,
         required: true,
     },
     authors: {
