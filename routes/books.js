@@ -11,7 +11,10 @@ getBooksByArticleAuthor,
 getBooksByArticleTitle,
 createBook,
 updateBook,
-deleteBook
+deleteBook,
+getBooksByPriceRange,
+getBooksTilesByTextSearch,
+getBooksAuthorByTextSearch
 } from '../controllers/booksController.js';
 
 const router = express.Router();
@@ -28,5 +31,9 @@ router.get('/article/title/:title', getBooksByArticleTitle);
 router.post('/', createBook);
 router.put('/:id', updateBook);
 router.delete('/:id', deleteBook);
+
+router.get('/price', getBooksByPriceRange);
+router.get('/search/title', getBooksTilesByTextSearch);
+router.get('/search/author', getBooksAuthorByTextSearch);
 
 export default router;

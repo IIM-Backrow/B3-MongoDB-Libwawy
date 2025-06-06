@@ -28,7 +28,9 @@ export const getBookById = async (req, res) => {
 
 export const getBooksByTitle = async (req, res) => {
     try {
-        const books = await Books.find({ title: new RegExp(req.params.title, 'i') });
+        const books = await Books.find({ 
+            title: { $regex: req.params.title, $options: 'i' }
+        });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à ce titre" });
         }
@@ -64,7 +66,7 @@ export const getBooksByTheme = async (req, res) => {
 
 export const getBookBySerieName = async (req, res) => {
     try {
-        const books = await Books.find({ 'serie.name': new RegExp(req.params.serieName, 'i') });
+    const books = await Books.find({ 'serie.name': { $regex: req.params.serieName, $options: 'i' } });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à cette série" });
         }
@@ -76,7 +78,7 @@ export const getBookBySerieName = async (req, res) => {
 
 export const getBooksBySerieNameAndNumber = async (req, res) => {
     try {
-        const books = await Books.find({ 'serie.name': new RegExp(req.params.serieName, 'i'), 'serie.number': req.params.serieNumber });
+        const books = await Books.find({ 'serie.name': { $regex: req.params.serieName, $options: 'i'}, 'serie.number': req.params.serieNumber });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à cette série et ce numéro" });
         }
@@ -100,7 +102,7 @@ export const getBooksByArticleAuthor = async (req, res) => {
 
 export const getBooksByArticleTitle = async (req, res) => {
     try {
-        const books = await Books.find({ 'articles.title': new RegExp(req.params.title, 'i') });
+        const books = await Books.find({ 'articles.title': {$regex:req.params.title, $options:'i'} });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à ce titre d'article" });
         }
@@ -165,6 +167,83 @@ export const deleteBook = async (req, res) => {
             return res.status(404).json({ message: "Aucun livre ne correspond à cet Id" });
         }
         res.status(200).json({ message: "Livre supprimé avec succès" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getBooksByPriceRange = async (req, res) => {
+    try {
+        const { minPrice, maxPrice } = req.query;
+
+        if (!minPrice && !maxPrice) {
+            return res.status(400).json({ message: "Les paramètres minPrice et maxPrice sont requis" });
+        } else if (!minPrice) {
+            return res.status(400).json({ message: "Le paramètre minPrice est requis" });
+        } else if (!maxPrice) {
+            return res.status(400).json({ message: "Le paramètre maxPrice est requis" });
+        }
+
+        const books = await Books.find({
+            price: { $gte: parseFloat(minPrice), $lte: parseFloat(maxPrice) }
+        });
+
+        if (books.length === 0) {
+            return res.status(404).json({ message: "Aucun livre ne correspond à cette plage de prix" });
+        }
+
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getBooksTilesByTextSearch = async (req, res) => {
+    try {
+        const searchText = req.query.searchText;
+        if (!searchText) {
+            return res.status(400).json({ message: "Le paramètre de recherche est requis" });
+        }
+
+        const books = await Books.find({
+            $or: [
+            { title: { $regex: searchText, $options: 'i' } },
+            { themes: { $elemMatch: { $regex: searchText, $options: 'i' } } },
+            { 'serie.name': { $regex: searchText, $options: 'i' } },
+            { 'articles.title': { $regex: searchText, $options: 'i' } },
+            ]
+        });
+
+        if (books.length === 0) {
+            return res.status(404).json({ message: "Aucun livre ne correspond à cette recherche" });
+        }
+
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getBooksAuthorByTextSearch = async (req, res) => {
+    try {
+        const searchText = req.query.searchText;
+        if (!searchText) {
+            return res.status(400).json({ message: "Le paramètre de recherche est requis" });
+        }
+
+        const books = await Books.find({
+            $or: [
+                { authors: { $elemMatch: { $regex: searchText, $options: 'i' } } },
+                { 'articles.authors': { $elemMatch: { $regex: searchText, $options: 'i' } } }
+            ]
+
+        });
+
+        if (books.length === 0) {
+            return res.status(404).json({ message: "Aucun livre ne correspond à cette recherche" });
+        }
+
+        res.status(200).json(books);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
