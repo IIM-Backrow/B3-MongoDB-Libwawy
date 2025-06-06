@@ -13,7 +13,7 @@ createBook,
 updateBook,
 deleteBook,
 getBooksByPriceRange,
-getBooksTilesByTextSearch,
+getBooksTitlesByTextSearch,
 getBooksAuthorByTextSearch
 } from '../controllers/booksController.js';
 
@@ -33,7 +33,7 @@ router.put('/:id', updateBook);
 router.delete('/:id', deleteBook);
 
 router.get('/price', getBooksByPriceRange);
-router.get('/search/title', getBooksTilesByTextSearch);
+router.get('/search/title', getBooksTitlesByTextSearch);
 router.get('/search/author', getBooksAuthorByTextSearch);
 
 export default router;

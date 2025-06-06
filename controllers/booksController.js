@@ -28,7 +28,7 @@ export const getBookById = async (req, res) => {
 
 export const getBooksByTitle = async (req, res) => {
     try {
-        const books = await Books.find({ 
+        const books = await Books.find({
             title: { $regex: req.params.title, $options: 'i' }
         });
         if (books.length === 0) {
@@ -66,7 +66,7 @@ export const getBooksByTheme = async (req, res) => {
 
 export const getBookBySerieName = async (req, res) => {
     try {
-    const books = await Books.find({ 'serie.name': { $regex: req.params.serieName, $options: 'i' } });
+        const books = await Books.find({ 'serie.name': { $regex: req.params.serieName, $options: 'i' } });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à cette série" });
         }
@@ -78,7 +78,7 @@ export const getBookBySerieName = async (req, res) => {
 
 export const getBooksBySerieNameAndNumber = async (req, res) => {
     try {
-        const books = await Books.find({ 'serie.name': { $regex: req.params.serieName, $options: 'i'}, 'serie.number': req.params.serieNumber });
+        const books = await Books.find({ 'serie.name': { $regex: req.params.serieName, $options: 'i' }, 'serie.number': req.params.serieNumber });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à cette série et ce numéro" });
         }
@@ -102,7 +102,7 @@ export const getBooksByArticleAuthor = async (req, res) => {
 
 export const getBooksByArticleTitle = async (req, res) => {
     try {
-        const books = await Books.find({ 'articles.title': {$regex:req.params.title, $options:'i'} });
+        const books = await Books.find({ 'articles.title': { $regex: req.params.title, $options: 'i' } });
         if (books.length === 0) {
             return res.status(404).json({ message: "Aucun livre ne correspond à ce titre d'article" });
         }
@@ -127,10 +127,10 @@ export const createBook = async (req, res) => {
             if (!page_count) missingFields.push('page_count');
             if (!release_date) missingFields.push('release_date');
             if (!publisher) missingFields.push('publisher');
-            
-            return res.status(400).json({ 
-                message: "Champs obligatoires manquants", 
-                missingFields 
+
+            return res.status(400).json({
+                message: "Champs obligatoires manquants",
+                missingFields
             });
         }
 
@@ -198,7 +198,7 @@ export const getBooksByPriceRange = async (req, res) => {
     }
 }
 
-export const getBooksTilesByTextSearch = async (req, res) => {
+export const getBooksTitlesByTextSearch = async (req, res) => {
     try {
         const searchText = req.query.searchText;
         if (!searchText) {
@@ -206,12 +206,11 @@ export const getBooksTilesByTextSearch = async (req, res) => {
         }
 
         const books = await Books.find({
-            $or: [
-            { title: { $regex: searchText, $options: 'i' } },
-            { themes: { $elemMatch: { $regex: searchText, $options: 'i' } } },
-            { 'serie.name': { $regex: searchText, $options: 'i' } },
-            { 'articles.title': { $regex: searchText, $options: 'i' } },
-            ]
+            $text: { $search: searchText}
+        }, {
+            score: { $meta: "textScore" }
+        }).sort({
+            score: { $meta: "textScore" }
         });
 
         if (books.length === 0) {
