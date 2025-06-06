@@ -37,34 +37,33 @@ const BooksScheme = new mongoose.Schema({
     },
     publisher: {
         type: String,
-        required: true,
     },
     summary: {
         type: String,
-        required: false,
+
     },
     price: {
         type: Number,
-        required: false,
+
     },
     serie: {
         name: {
             type: String,
-            required: false,
+
         },
         number: {
             type: Number,
-            required: false,
+
         }
     },
     articles: [{
         title: {
             type: String,
-            required: false,
+
         },
         authors: {
             type: [String],
-            required: false,
+
         }
     }]
 })
